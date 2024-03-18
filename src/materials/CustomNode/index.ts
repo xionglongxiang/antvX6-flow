@@ -1,5 +1,5 @@
 import View from './view.vue'
-import ConfigForm from './config.vue'
+import ConfigForm from './config-form.vue'
 import config from './config'
 
 export default {

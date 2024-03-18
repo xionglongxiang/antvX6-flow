@@ -1,7 +1,6 @@
 <template>
   <el-card>
     <div slot="header" class="clearfix">
-      111
       <span>{{nodeInfo.name}}</span>
     </div>
     <div class="content">{{nodeInfo.desc}}</div>

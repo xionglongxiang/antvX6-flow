@@ -1,10 +1,12 @@
 import { Graph } from '@antv/x6';  
 import { Dnd } from '@antv/x6-plugin-dnd'; 
+import TaskNode from '../materials/TaskNode'
+import CustomNode from '../materials/CustomNode'
 
 // 定义端口对象的类型  
-interface PortGroup {  
-  position: string;  
-  attrs: {  
+interface PortGroup {
+  position: string;
+  attrs: {
     circle: {  
       r: number;  
       magnet: boolean;  
@@ -12,8 +14,8 @@ interface PortGroup {
       strokeWidth: number;  
       fill: string;  
     };  
-  };  
-}  
+  };
+}
   
 interface Ports {  
   groups: {  
@@ -100,15 +102,15 @@ const ports: Ports = {
 // 拖拽生成四边形或者圆形  
 export const startDragToGraph = (graph: Graph, type: string, e: MouseEvent) => {  
   
-  let nodeConfig: any = {  
-    width: 100,  
-    height: 60,  
-    attrs: {  
-      label: {  
-        text: '正方形节点',  
-        fill: '#000000',  
-        fontSize: 14,  
-        textWrap: {  
+  let nodeConfig: any = {
+    width: 100,
+    height: 60,
+    attrs: {
+      label: {
+        text: '正方形节点',
+        fill: '#000000',
+        fontSize: 14,
+        textWrap: {
           width: -10,  
           height: -10,  
           ellipsis: true,  
@@ -124,50 +126,10 @@ export const startDragToGraph = (graph: Graph, type: string, e: MouseEvent) => {
   };  
   
   if (type === 'custom-node') {
-    nodeConfig = {
-      ...nodeConfig,
-      type: 'custom-node',
-      shape: 'custom-node',
-      width: 300,
-      height: 121,
-      data: {
-        id: 'asdf',
-        type: 'abcd',
-        name: '自定义节点',
-        desc: '自定义内容'
-      },
-      attrs: {  
-        ...nodeConfig.attrs,  
-        label: {  
-          ...nodeConfig.attrs.label,  
-          text: '圆形节点',  
-        },  
-      },  
-      component: 'custom-node'
-    }
+    nodeConfig = CustomNode.config
   } else if (type === 'task-node') {
-    nodeConfig = {
-      ...nodeConfig,
-      type: 'task-node',
-      shape: 'task-node',
-      width: 300,
-      height: 121,
-      data: {
-        id: 'asdf',
-        type: 'abcd',
-        name: '任务节点',
-        desc: '节点内容'
-      },
-      attrs: {  
-        ...nodeConfig.attrs,  
-        label: {  
-          ...nodeConfig.attrs.label,  
-          text: '圆形节点',  
-        },  
-      },  
-      component: 'task-node'
-    }
-  } else if (type === 'Rect') {  
+    nodeConfig = TaskNode.config
+  } else if (type === 'Rect') {
     // 不需要修改 nodeConfig，因为它是默认配置  
   } else if (type === 'Circle') {  
     nodeConfig = {  
@@ -207,6 +169,6 @@ export const startDragToGraph = (graph: Graph, type: string, e: MouseEvent) => {
   
   const node = graph.createNode(nodeConfig);
 
-  const dnd = new Dnd({ target: graph});  
+  const dnd = new Dnd({ target: graph});
   dnd.start(node, e);
 };

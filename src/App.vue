@@ -18,217 +18,48 @@
     <div id="chat-container"></div>
   </main>
 
+  
   <aside id="config-area">
-    <component :is="TaskNode.ConfigForm"></component>
+    <ConfigPanel></ConfigPanel>
   </aside>
 </template>
 
 <script setup lang="ts">
 
 import { startDragToGraph } from './Graph/methods'
-import { Graph, Shape, FunctionExt, DataUri } from '@antv/x6';
-import { Clipboard } from '@antv/x6-plugin-clipboard'
-import { Selection } from '@antv/x6-plugin-selection'
-import { Keyboard } from '@antv/x6-plugin-keyboard'
-import { Snapline } from '@antv/x6-plugin-snapline'
+import { Graph} from '@antv/x6';
 import { ElButton } from 'element-plus'
-
 import bindKey from './Graph/bindKey'
-
-import { ref, onMounted } from 'vue'
+import { onMounted } from 'vue'
 import { register } from "@antv/x6-vue-shape";
 import TaskNode from './materials/TaskNode/index'
 import CustomNode from './materials/CustomNode';
-
+import getGraphConfig from './utils/graph-config';
+import registerPlugins from './utils/register-plugins';
+import registerEvents from './utils/register-events';
+import ConfigPanel from './ConfigPanel.vue'
 
 register(TaskNode.config)
+
+let win: any = window
+win.PluginsList = new Map()
+
 register(CustomNode.config)
 
-
-const grid = { // 网格设置
-  size: 20,      // 网格大小 10px
-  visible: true, // 渲染网格背景
-  type: 'mesh',
-  args: {
-    color: '#D0D0D0',
-    thickness: 1,     // 网格线宽度/网格点大小
-    factor: 10,
-  }
-}
 let graph: any;
-
 let container: any;
-let type: String;
-let selectCell: any;
-
-let connectEdgeType = {  //连线方式
-  connector: 'normal',
-  router: {
-    name: ''
-  }
-}
-
-
+  
 onMounted(() => {
   container = document.getElementById('chat-container')
-  graph = new Graph({
-    container: document.getElementById('chat-container') || undefined,
-    width: 1700,
-    height: '100%',
-    grid: grid,
-    resizing: { //调整节点宽高
-      enabled: true,
-      orthogonal: false,
-    },
-    selecting: true, //可选
-    snapline: true,
-    interacting: {
-      edgeLabelMovable: true
-    },
-    connecting: { // 节点连接
-      anchor: 'center',
-      connectionPoint: 'anchor',
-      allowBlank: false,
-      snap: true,
-      createEdge() {
-        return new Shape.Edge({
-          attrs: {
-            line: {
-              stroke: '#1890ff',
-              strokeWidth: 1,
-              targetMarker: {
-                name: 'classic',
-                size: 8
-              },
-              strokeDasharray: 0, //虚线
-              style: {
-                animation: 'ant-line 30s infinite linear',
-              }
-            }
-          },
-          label: {
-            text: ''
-          },
-          connector: connectEdgeType.connector,
-          router: {
-            name: connectEdgeType.router.name || ''
-          },
-          zIndex: 0
-        })
-      },
-    },
-    highlighting: {
-      magnetAvailable: {
-        name: 'stroke',
-        args: {
-          padding: 4,
-          attrs: {
-            strokeWidth: 4,
-            stroke: '#6a6c8a'
-          }
-        }
-      }
-    },
-  });
+  let config: any = getGraphConfig(container)
+  graph = new Graph(config);
   let win: any = window
   win.graph = graph
-
-  graph.use(
-    new Clipboard({
-      enabled: true,
-    }),
-  )
-    .use(new Snapline()) // 使用辅助线，在移动过程中辅助对齐。
-    .use(
-      new Selection({
-        enabled: true,
-        rubberband: true,
-        showNodeSelectionBox: true,
-      }),
-    )
-    .use(
-      new Keyboard({
-        enabled: true,
-        global: true,
-      }),
-    )
-
+  registerPlugins(graph)
   bindKey(graph)
-  // end 
-
-
-
-  graph.on('node:mouseleave', () => {
-    const ports = container!.querySelectorAll(
-      '.x6-port-body'
-    )
-    showPorts(ports, false)
-  })
-  graph.on('blank:click', () => {
-    type = 'grid'
-    const ports = container.querySelectorAll(
-      '.x6-port-body'
-    )
-
-    showPorts(ports, false)
-  })
-
-
-
-  
-  graph.on('node:mouseenter', FunctionExt.debounce(({e, node, view}) => {
-    const ports = container.querySelectorAll(
-      '.x6-port-body'
-    )
-
-    showPorts(ports, true)
-  }), 500)
-
-  graph.on('cell:click', ({ cell }) => {
-    type = cell.isNode() ? 'node' : 'edge'
-  })
-
-  graph.on('selection:changed', (args) => {
-
-    if (args.selected.length === 1) {
-      console.log(args.selected[0])
-    }
-    args.added.forEach(cell => {
-      if (cell.isEdge()) {
-        cell.isEdge() && cell.attr('line/strokeDasharray', 5) //虚线蚂蚁线
-        cell.addTools([
-          {
-            name: 'vertices',
-            args: {
-              padding: 4,
-              attrs: {
-                strokeWidth: 0.1,
-                stroke: '#2d8cf0',
-                fill: '#ffffff',
-              }
-            },
-          },
-        ])
-      }
-    })
-    args.removed.forEach(cell => {
-      cell.isEdge() && cell.attr('line/strokeDasharray', 0)  //正常线
-      cell.removeTools()
-    })
-  })
-
-  const data = {};
-
-
-  graph.fromJSON(data)
+  registerEvents(graph, container)
 })
 
-
-const showPorts = (ports: any, show: any) => {
-  for (let i = 0, len = ports.length; i < len; i = i + 1) {
-    ports[i].style.visibility = show ? 'visible' : 'hidden'
-  }
-}
 
 const startDrag = (type: any, e: any) => {
   startDragToGraph(graph, type, e)
@@ -237,7 +68,6 @@ const startDrag = (type: any, e: any) => {
 const save = () => {
   console.log(graph.toJSON())
 }
-
 
 </script>
 
