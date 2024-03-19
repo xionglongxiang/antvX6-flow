@@ -80,8 +80,6 @@ export default {
   height: 90,
   data: {
     type: name,
-    name: 'base node',
-    desc: 'base node'
   },  
   ports
 }

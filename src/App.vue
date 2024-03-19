@@ -7,8 +7,9 @@
       <div class="material-rect" title="正方形节点" @mousedown="startDrag('Rect', $event)">
       </div>
       <br>
-      <TaskNode.View @mousedown="startDrag('task-node', $event)"></TaskNode.View>
-      <CustomNode.View @mousedown="startDrag('custom-node', $event)"></CustomNode.View>
+      <StartNode.MaterialView @mousedown="StartNode.addToGraph(graphStore.graph, $event)"></StartNode.MaterialView>
+      <TaskNode.MaterialView @mousedown="TaskNode.addToGraph(graphStore.graph, $event)"></TaskNode.MaterialView>
+      <CustomNode.MaterialView @mousedown="CustomNode.addToGraph(graphStore.graph, $event)"></CustomNode.MaterialView>
     </div>
   </aside>
   <header>
@@ -20,7 +21,7 @@
 
   
   <aside id="config-area">
-    <ConfigPanel></ConfigPanel>
+    <ConfigPanel :graph="graphStore.graph"></ConfigPanel>
   </aside>
 </template>
 
@@ -30,29 +31,29 @@ import { startDragToGraph } from './Graph/methods'
 import { Graph} from '@antv/x6';
 import { ElButton } from 'element-plus'
 import bindKey from './Graph/bindKey'
-import { onMounted } from 'vue'
+import { onMounted,ref} from 'vue'
 import { register } from "@antv/x6-vue-shape";
 import TaskNode from './materials/TaskNode/index'
 import CustomNode from './materials/CustomNode';
+import StartNode from './materials/StartNode'
 import getGraphConfig from './utils/graph-config';
 import registerPlugins from './utils/register-plugins';
 import registerEvents from './utils/register-events';
 import ConfigPanel from './ConfigPanel.vue'
+import { useGraph } from './stores/useGraph'
 
-register(TaskNode.config)
+register(TaskNode.initConfig)
+register(CustomNode.initConfig)
+register(StartNode.initConfig)
 
-let win: any = window
-win.PluginsList = new Map()
-
-register(CustomNode.config)
-
-let graph: any;
+let graphStore = useGraph();
 let container: any;
   
-onMounted(() => {
+onMounted(async () => {
   container = document.getElementById('chat-container')
   let config: any = getGraphConfig(container)
-  graph = new Graph(config);
+  
+  let graph = await graphStore.updateGraph(new Graph(config))
   let win: any = window
   win.graph = graph
   registerPlugins(graph)
@@ -60,13 +61,12 @@ onMounted(() => {
   registerEvents(graph, container)
 })
 
-
 const startDrag = (type: any, e: any) => {
-  startDragToGraph(graph, type, e)
+  startDragToGraph(graphStore.graph, type, e)
 }
 
 const save = () => {
-  console.log(graph.toJSON())
+  console.log(graphStore.graph.toJSON())
 }
 
 </script>

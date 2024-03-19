@@ -1,32 +1,7 @@
 import { Graph } from '@antv/x6';  
 import { Dnd } from '@antv/x6-plugin-dnd'; 
-import TaskNode from '../materials/TaskNode'
-import CustomNode from '../materials/CustomNode'
 
-// 定义端口对象的类型  
-interface PortGroup {
-  position: string;
-  attrs: {
-    circle: {  
-      r: number;  
-      magnet: boolean;  
-      stroke: string;  
-      strokeWidth: number;  
-      fill: string;  
-    };  
-  };
-}
-  
-interface Ports {  
-  groups: {  
-    top: PortGroup;
-    bottom: PortGroup;
-    right: PortGroup;
-    left: PortGroup;
-  };  
-}  
-
-const ports: Ports = {
+const ports = {
   groups: {
     // 输入链接桩群组定义
     top: {
@@ -125,11 +100,7 @@ export const startDragToGraph = (graph: Graph, type: string, e: MouseEvent) => {
     ports: ports,  
   };  
   
-  if (type === 'custom-node') {
-    nodeConfig = CustomNode.config
-  } else if (type === 'task-node') {
-    nodeConfig = TaskNode.config
-  } else if (type === 'Rect') {
+  if (type === 'Rect') {
     // 不需要修改 nodeConfig，因为它是默认配置  
   } else if (type === 'Circle') {  
     nodeConfig = {  
@@ -168,7 +139,6 @@ export const startDragToGraph = (graph: Graph, type: string, e: MouseEvent) => {
   }  
   
   const node = graph.createNode(nodeConfig);
-
   const dnd = new Dnd({ target: graph});
   dnd.start(node, e);
 };

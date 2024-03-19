@@ -1,6 +1,5 @@
 <template>
-    this is config panel of task node
-
+    this is config panel of custom node
     {{ data }}
 </template>
 
@@ -17,6 +16,7 @@ defineProps({
   }
 });
 </script>
+
 <style lang="scss">
 
 </style>

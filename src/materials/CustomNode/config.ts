@@ -1,31 +1,7 @@
 import {name} from './properties'
 import View from './view.vue'
 
-  
-// 定义端口对象的类型  
-interface PortGroup {  
-  position: string;  
-  attrs: {  
-    circle: {  
-      r: number;  
-      magnet: boolean;  
-      stroke: string;  
-      strokeWidth: number;  
-      fill: string;  
-    };  
-  };  
-}  
-interface Ports {  
-  groups: {  
-    top: PortGroup;
-    bottom: PortGroup;
-    right: PortGroup;
-    left: PortGroup;
-  };
-
-}  
-
-const ports: Ports = {
+const ports = {
   groups: {
     // 输入链接桩群组定义
     top: {
@@ -103,7 +79,9 @@ export default {
   width: 300,
   height: 90,
   data: {
-    type: 'custom-node',
+    type: name,
+    name: 'base node',
+    desc: 'base node'
   },  
   ports
 }

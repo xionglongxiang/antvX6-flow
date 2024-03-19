@@ -3,13 +3,12 @@ import ConfigForm from './config-form.vue'
 import BaseNode from '../BaseNode'
 import config from './config'
 
-export default class CustomNode extends BaseNode {
+export default class StartNode extends BaseNode {
     
-    static NodeType = 'custom-node'
-    static Shape = 'custom-node'
+    static NodeType = 'start-node'
+    static Shape = 'start-node'
     static MaterialView = View
     static DisplayView = View
     static ConfigFormView = ConfigForm
-    static initConfig = config
-    
+    static initConfig:any = config
 }

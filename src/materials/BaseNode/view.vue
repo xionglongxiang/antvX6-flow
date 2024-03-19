@@ -9,8 +9,7 @@
 
 <script setup lang="ts">
 import { ElCard } from 'element-plus'
-
-const props = defineProps({
+defineProps({
   nodeInfo: {
     type: Object,
     default: ()=> {
